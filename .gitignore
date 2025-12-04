@@ -1,0 +1,23 @@
+# .gitignore
+node_modules/
+__pycache__/
+*.pyc
+.env
+.venv
+venv/
+env/
+.DS_Store
+*.log
+.next/
+dist/
+build/
+coverage/
+.terraform/
+*.tfstate
+*.tfstate.backup
+.pytest_cache/
+.mypy_cache/
+*.db
+*.sqlite
+*.sqlite3
+
