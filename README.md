@@ -2,57 +2,56 @@
 
 CloudCost Sentinel is a multi-cloud FinOps observability and analytics platform. Its core purpose is to help engineering and finance teams understand cloud expenditure, normalize billing data across providers, detect cost anomalies, and enforce budgets across AWS, Microsoft Azure, and Google Cloud Platform (GCP).
 
-## Problem Statement & Motivation
+## 1. Problem Statement & Motivation
 Managing cloud spend across multiple providers often requires disjointed scripts or expensive proprietary SaaS solutions. CloudCost Sentinel provides a foundational, open-source approach to ingesting raw CSV billing exports from major cloud providers, normalizing the data into a unified relational schema, and exposing actionable insights through a modern Next.js dashboard and FastAPI backend.
 
-**Intended Users:** Cloud Infrastructure Engineers, FinOps Practitioners, DevOps/DevSecOps Engineers.
-**Status:** MVP / Portfolio Project. 
+**Intended Users:** Cloud Infrastructure Engineers, FinOps Practitioners, DevOps/DevSecOps Engineers.  
+**Status:** MVP / Portfolio Project.  
 **Important Limitations:** The platform currently lacks Authentication/Authorization (RBAC) and operates safely only in local/isolated environments. It relies on batch ingestion rather than streaming live metrics.
 
 ---
 
-## Table of Contents
-- [CloudCost Sentinel](#cloudcost-sentinel)
-  - [Problem Statement \& Motivation](#problem-statement--motivation)
-  - [Table of Contents](#table-of-contents)
-  - [Feature Breakdown](#feature-breakdown)
-  - [Architecture](#architecture)
-    - [Ingestion Lifecycle Sequence](#ingestion-lifecycle-sequence)
-  - [Technology Stack](#technology-stack)
-  - [Repository Structure](#repository-structure)
-  - [Prerequisites](#prerequisites)
-  - [Installation and Setup](#installation-and-setup)
-    - [1. Clone and start Redis](#1-clone-and-start-redis)
-    - [2. Backend \& Database Initialization](#2-backend--database-initialization)
-    - [3. Start the FastAPI Server](#3-start-the-fastapi-server)
-    - [4. Start the Celery Worker](#4-start-the-celery-worker)
-    - [5. Start the Frontend](#5-start-the-frontend)
-  - [Environment Variables](#environment-variables)
-  - [Database and Migrations](#database-and-migrations)
-  - [Billing Ingestion Guides](#billing-ingestion-guides)
-    - [AWS (Cost and Usage Report)](#aws-cost-and-usage-report)
-    - [Azure (Cost Management Export)](#azure-cost-management-export)
-    - [GCP (BigQuery Export)](#gcp-bigquery-export)
-  - [FinOps Calculations](#finops-calculations)
-  - [API Reference](#api-reference)
-    - [POST `/api/v1/upload/{provider}`](#post-apiv1uploadprovider)
-    - [GET `/api/v1/costs`](#get-apiv1costs)
-    - [GET `/api/v1/costs/history`](#get-apiv1costshistory)
-    - [GET `/api/v1/ingestions`](#get-apiv1ingestions)
-    - [POST `/api/v1/anomalies/detect`](#post-apiv1anomaliesdetect)
-  - [Frontend Guide](#frontend-guide)
-  - [Background Jobs and Redis](#background-jobs-and-redis)
-  - [Testing and Quality Assurance](#testing-and-quality-assurance)
-  - [CI/CD and Infrastructure](#cicd-and-infrastructure)
-  - [Security and Privacy](#security-and-privacy)
-  - [Troubleshooting](#troubleshooting)
-  - [Contribution \& Governance](#contribution--governance)
-  - [Roadmap](#roadmap)
-  - [Disclaimer](#disclaimer)
+## 2. Table of Contents
+1. [Problem Statement & Motivation](#1-problem-statement--motivation)
+2. [Table of Contents](#2-table-of-contents)
+3. [Feature Breakdown](#3-feature-breakdown)
+4. [Architecture](#4-architecture)
+   - [4.1. Ingestion Lifecycle Sequence](#41-ingestion-lifecycle-sequence)
+5. [Technology Stack](#5-technology-stack)
+6. [Repository Structure](#6-repository-structure)
+7. [Prerequisites](#7-prerequisites)
+8. [Installation and Setup](#8-installation-and-setup)
+   - [8.1. Clone and start Redis](#81-clone-and-start-redis)
+   - [8.2. Backend & Database Initialization](#82-backend--database-initialization)
+   - [8.3. Start the FastAPI Server](#83-start-the-fastapi-server)
+   - [8.4. Start the Celery Worker](#84-start-the-celery-worker)
+   - [8.5. Start the Frontend](#85-start-the-frontend)
+9. [Environment Variables](#9-environment-variables)
+10. [Database and Migrations](#10-database-and-migrations)
+11. [Billing Ingestion Guides](#11-billing-ingestion-guides)
+    - [11.1. AWS (Cost and Usage Report)](#111-aws-cost-and-usage-report)
+    - [11.2. Azure (Cost Management Export)](#112-azure-cost-management-export)
+    - [11.3. GCP (BigQuery Export)](#113-gcp-bigquery-export)
+12. [FinOps Calculations](#12-finops-calculations)
+13. [API Reference](#13-api-reference)
+    - [13.1. POST `/api/v1/upload/{provider}`](#131-post-apiv1uploadprovider)
+    - [13.2. GET `/api/v1/costs`](#132-get-apiv1costs)
+    - [13.3. GET `/api/v1/costs/history`](#133-get-apiv1costshistory)
+    - [13.4. GET `/api/v1/ingestions`](#134-get-apiv1ingestions)
+    - [13.5. POST `/api/v1/anomalies/detect`](#135-post-apiv1anomaliesdetect)
+14. [Frontend Guide](#14-frontend-guide)
+15. [Background Jobs and Redis](#15-background-jobs-and-redis)
+16. [Testing and Quality Assurance](#16-testing-and-quality-assurance)
+17. [CI/CD and Infrastructure](#17-cicd-and-infrastructure)
+18. [Security and Privacy](#18-security-and-privacy)
+19. [Troubleshooting](#19-troubleshooting)
+20. [Contribution & Governance](#20-contribution--governance)
+21. [Roadmap](#21-roadmap)
+22. [Disclaimer](#22-disclaimer)
 
 ---
 
-## Feature Breakdown
+## 3. Feature Breakdown
 
 | Feature | Status | Description |
 | :--- | :--- | :--- |
@@ -70,7 +69,7 @@ Managing cloud spend across multiple providers often requires disjointed scripts
 
 ---
 
-## Architecture
+## 4. Architecture
 
 CloudCost Sentinel utilizes a decoupled architecture where a Next.js frontend communicates with a FastAPI Python backend. Heavy lifting (CSV parsing and rolling-average anomaly detection) is delegated to Celery workers mediated by Redis.
 
@@ -83,7 +82,7 @@ graph TD
     Worker -->|Write Results| DB
 ```
 
-### Ingestion Lifecycle Sequence
+### 4.1. Ingestion Lifecycle Sequence
 ```mermaid
 sequenceDiagram
     participant User
@@ -105,7 +104,7 @@ sequenceDiagram
 
 ---
 
-## Technology Stack
+## 5. Technology Stack
 
 * **Frontend:** Next.js 16+, React 18, TypeScript, Tailwind CSS, Recharts.
 * **Backend:** Python 3.11, FastAPI.
@@ -116,7 +115,7 @@ sequenceDiagram
 
 ---
 
-## Repository Structure
+## 6. Repository Structure
 
 ```text
 cloudcost-sentinel/
@@ -145,20 +144,20 @@ cloudcost-sentinel/
 
 ---
 
-## Prerequisites
+## 7. Prerequisites
 
-* **Node.js**: v18+ (verified with npm)
+* **Node.js**: v20+ (verified with npm)
 * **Python**: v3.11+
 * **Redis**: Must be running locally on `localhost:6379`. (On Windows, WSL or Memurai can be used).
 * **Operating System**: macOS, Linux, or Windows (PowerShell supported).
 
 ---
 
-## Installation and Setup
+## 8. Installation and Setup
 
 Follow these exact steps to run the complete stack locally without Docker.
 
-### 1. Clone and start Redis
+### 8.1. Clone and start Redis
 Ensure Redis is running locally.
 ```bash
 git clone https://github.com/TejasPatil-TP/cloudcost-sentinel.git
@@ -166,7 +165,7 @@ cd cloudcost-sentinel
 # Ensure redis is running in the background, e.g., `redis-server`
 ```
 
-### 2. Backend & Database Initialization
+### 8.2. Backend & Database Initialization
 Open a terminal for the backend:
 ```powershell
 cd backend
@@ -179,13 +178,13 @@ $env:PYTHONPATH="."
 alembic upgrade head
 ```
 
-### 3. Start the FastAPI Server
+### 8.3. Start the FastAPI Server
 In the same backend terminal:
 ```powershell
 uvicorn app.main:app --port 8000 --reload
 ```
 
-### 4. Start the Celery Worker
+### 8.4. Start the Celery Worker
 Open a **second** terminal for the Celery worker:
 ```powershell
 cd backend
@@ -196,7 +195,7 @@ python -m celery -A app.worker.celery_app worker -l info --pool=solo
 # On Linux/macOS: celery -A app.worker.celery_app worker -l info
 ```
 
-### 5. Start the Frontend
+### 8.5. Start the Frontend
 Open a **third** terminal:
 ```powershell
 cd frontend
@@ -209,7 +208,7 @@ Stop all processes cleanly using `Ctrl+C`.
 
 ---
 
-## Environment Variables
+## 9. Environment Variables
 
 The application relies on sensible defaults for local development.
 
@@ -223,7 +222,7 @@ The application relies on sensible defaults for local development.
 
 ---
 
-## Database and Migrations
+## 10. Database and Migrations
 
 CloudCost Sentinel uses **Alembic** to manage SQLite schema changes.
 * `BillingRecord`: Stores normalized line-item cost data.
@@ -239,11 +238,11 @@ If testing locally, deleting `cloudcost.db` and running `alembic upgrade head` w
 
 ---
 
-## Billing Ingestion Guides
+## 11. Billing Ingestion Guides
 
 The ingestion engine supports batch CSV processing. Files are parsed via Python Pandas inside the Celery worker.
 
-### AWS (Cost and Usage Report)
+### 11.1. AWS (Cost and Usage Report)
 * **Required Schema**: `Identity/LineItemId`, `lineItem/ProductCode`, `lineItem/UsageStartDate`, `lineItem/UsageEndDate`, `lineItem/UnblendedCost`.
 * **Synthetic Sample (`test_e2e_aws.csv`)**:
 ```csv
@@ -251,10 +250,10 @@ Identity/LineItemId,lineItem/ProductCode,lineItem/UsageStartDate,lineItem/UsageE
 123,AmazonEC2,2023-10-01T00:00:00Z,2023-10-01T01:00:00Z,1.50
 ```
 
-### Azure (Cost Management Export)
+### 11.2. Azure (Cost Management Export)
 * **Required Schema**: `SubscriptionId`, `MeterCategory`, `Date`, `CostInBillingCurrency`, `BillingCurrencyCode`.
 
-### GCP (BigQuery Export)
+### 11.3. GCP (BigQuery Export)
 * **Required Schema**: `billing_account_id`, `service.description`, `usage_start_time`, `usage_end_time`, `cost`, `currency`.
 
 **Importing via API:**
@@ -265,7 +264,7 @@ curl -X POST -F "file=@test_e2e_aws.csv" http://localhost:8000/api/v1/upload/aws
 
 ---
 
-## FinOps Calculations
+## 12. FinOps Calculations
 
 **Cost Aggregation:** Line items are grouped by provider and usage start date. All currencies are currently ingested as raw numerical values (currency conversion is a planned roadmap item).
 
@@ -276,32 +275,32 @@ The `detect_anomalies` Celery task calculates the average daily spend per provid
 
 ---
 
-## API Reference
+## 13. API Reference
 
 The backend exposes the following REST API endpoints. OpenAPI documentation is automatically available at `http://localhost:8000/docs`.
 
-### POST `/api/v1/upload/{provider}`
+### 13.1. POST `/api/v1/upload/{provider}`
 * **Purpose**: Upload a billing CSV for async processing.
 * **Params**: `provider` (aws, azure, gcp). Form-data file.
 * **Error**: 413 if file exceeds 10MB. 400 if provider is invalid.
 * **Response**: `{"info": "file 'test.csv' saved and processing started"}`
 
-### GET `/api/v1/costs`
+### 13.2. GET `/api/v1/costs`
 * **Purpose**: Retrieve aggregate lifetime costs grouped by provider.
 * **Response**: `[{"provider": "aws", "total_cost": 4.5}]`
 
-### GET `/api/v1/costs/history`
+### 13.3. GET `/api/v1/costs/history`
 * **Purpose**: Retrieve daily time-series total costs for dashboard charts.
 
-### GET `/api/v1/ingestions`
+### 13.4. GET `/api/v1/ingestions`
 * **Purpose**: Retrieve the last 5 async celery jobs and their success/fail states.
 
-### POST `/api/v1/anomalies/detect`
+### 13.5. POST `/api/v1/anomalies/detect`
 * **Purpose**: Manually trigger the 7-day rolling average detection background task.
 
 ---
 
-## Frontend Guide
+## 14. Frontend Guide
 
 The Next.js application provides several primary views:
 * **Dashboard (`/`)**: Displays top-level KPI cards and a historical spending bar chart.
@@ -315,7 +314,7 @@ The Next.js application provides several primary views:
 
 ---
 
-## Background Jobs and Redis
+## 15. Background Jobs and Redis
 
 Celery is used to ensure the FastAPI server remains responsive during heavy pandas CSV processing.
 * Jobs are tracked in the `ingestion_jobs` table.
@@ -323,7 +322,7 @@ Celery is used to ensure the FastAPI server remains responsive during heavy pand
 
 ---
 
-## Testing and Quality Assurance
+## 16. Testing and Quality Assurance
 
 The project maintains a rigorous standard of testing.
 * **Backend Tests**: Run `pytest tests/` in the `backend/` directory.
@@ -333,7 +332,7 @@ The project maintains a rigorous standard of testing.
 
 ---
 
-## CI/CD and Infrastructure
+## 17. CI/CD and Infrastructure
 
 * **GitHub Actions**: `.github/workflows/ci.yml` runs `pytest` and Next.js builds on every push to `main`.
 * **Terraform**: Scaffolding exists in `infrastructure/terraform/` but should not be executed without explicit operational approval. It provisions zero resources by default.
@@ -341,7 +340,7 @@ The project maintains a rigorous standard of testing.
 
 ---
 
-## Security and Privacy
+## 18. Security and Privacy
 
 **WARNING: Authentication and Authorization (RBAC) are intentionally NOT implemented in this MVP.**
 
@@ -352,7 +351,7 @@ The project maintains a rigorous standard of testing.
 
 ---
 
-## Troubleshooting
+## 19. Troubleshooting
 
 * **`OperationalError: no such table`**: You forgot to run `alembic upgrade head`.
 * **Celery Worker fails to start on Windows**: Use `python -m celery ... --pool=solo` as standard Celery forking is unsupported on native Windows.
@@ -362,16 +361,17 @@ The project maintains a rigorous standard of testing.
 
 ---
 
-## Contribution & Governance
+## 20. Contribution & Governance
 
+* Refer to [CONTRIBUTING.md](CONTRIBUTING.md) for local workflow and code formatting expectations.
+* Refer to [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) for community participation guidelines.
+* Refer to [SECURITY.md](SECURITY.md) for vulnerability disclosure procedures.
 * Create feature branches off `main`.
 * Ensure `pytest` and `npm run build` pass perfectly before submitting a Pull Request.
-* Maintain strict TypeScript interfaces (avoid `any` types).
-* This project is open-source. Please open an issue for major architectural changes.
 
 ---
 
-## Roadmap
+## 21. Roadmap
 
 **Planned:**
 * [ ] Implement OAuth2 / OIDC Authentication.
@@ -381,7 +381,7 @@ The project maintains a rigorous standard of testing.
 
 ---
 
-## Disclaimer
+## 22. Disclaimer
 
 **CloudCost Sentinel is a portfolio/MVP project.**
-All local demonstrations run on synthetic, localized data. The application does **not** connect directly to live AWS/Azure/GCP APIs or incur cloud charges automatically.
+All local demonstrations run on synthetic, localized data. The application does **not** connect directly to live AWS/Azure/GCP APIs or incur cloud charges automatically. No production guarantees, cost savings, or security certifications are claimed. Use at your own operational risk.
